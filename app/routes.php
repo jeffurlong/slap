@@ -13,6 +13,5 @@
 
 Route::get('/', function()
 {
-    // echo '<pre>';
-    // dd(Request::subdomain(), $_SERVER);
+        return View::make('www.index');
 });

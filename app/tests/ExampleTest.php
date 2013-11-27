@@ -17,15 +17,21 @@ class ExampleTest extends TestCase {
 	public function testRequestWithSubdomain()
 	{
 		$request = Request::create('http://demo.slap.local');
-		
+
 		$this->assertEquals('demo', $request->subdomain());
 	}
 
 	public function testRequestWithoutSubdomain()
 	{
 		$request = Request::create('http://www.slap.local');
-		
+
 		$this->assertEquals(null, $request->subdomain());
+	}
+
+	public function testRequestRespondsOK()
+	{
+		$response = $this->call('GET', '/');
+		$this->assertEquals('WTF', $response->getContent());
 	}
 
 }
