@@ -1,4 +1,4 @@
-slap
+Slap
 ====
 
-Simple Laravel App Project
+Simple Laravel application project
