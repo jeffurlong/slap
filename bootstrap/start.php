@@ -2,6 +2,17 @@
 
 /*
 |--------------------------------------------------------------------------
+| Override the Application Request Class
+|--------------------------------------------------------------------------
+|
+| Tell the Application to use the custom Request Class. This class extends
+| Request with the subdomain method
+|
+*/
+Illuminate\Foundation\Application::requestClass('Slap\Extensions\Request');
+
+/*
+|--------------------------------------------------------------------------
 | Create The Application
 |--------------------------------------------------------------------------
 |

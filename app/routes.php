@@ -13,5 +13,6 @@
 
 Route::get('/', function()
 {
-	return View::make('hello');
+    // echo '<pre>';
+    // dd(Request::subdomain(), $_SERVER);
 });

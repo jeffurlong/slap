@@ -13,6 +13,9 @@
 		"phpunit/phpunit": "3.7.*"
 	},
 	"autoload": {
+		"psr-0": {
+        	"Slap": "app/library/"
+    	},
 		"classmap": [
 			"app/commands",
 			"app/controllers",
