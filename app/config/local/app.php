@@ -14,5 +14,20 @@ return array(
     */
 
     'debug' => true,
+    
+     /*
+    |--------------------------------------------------------------------------
+    | Application Subdomains
+    |--------------------------------------------------------------------------
+    |
+    | Application Tenants must have their subdomain registered here. Attempting to
+    | access an unregistered subdomain will cause the application to abort with
+    | a 404 error. (www is the default tenant).
+    |
+    */
 
+    'subdomains' => array(
+        'www',
+        'demo',
+    ),
 );

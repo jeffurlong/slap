@@ -8,6 +8,7 @@ clean:
 
 css:
 	lessc -yui-compress  app/assets/less/www.less $(PUB)/assets/css/slap.min.css
+	lessc -yui-compress  app/assets/less/tenant.less $(PUB)/assets/css/site.min.css
 
 js:
 	cp app/assets/js/modernizr.simple.min.js $(PUB)/assets/js/modernizr.min.js

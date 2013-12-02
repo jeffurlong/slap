@@ -13,7 +13,12 @@
 
 App::before(function($request)
 {
-	//
+    // Production must me secure
+	if ( ! Request::secure() and App::environment() === 'production')
+    {
+        return Redirect::secure(Request::fullUrl());
+    }
+    
 });
 
 
@@ -77,4 +82,36 @@ Route::filter('csrf', function()
 	{
 		throw new Illuminate\Session\TokenMismatchException;
 	}
+});
+
+/*
+|--------------------------------------------------------------------------
+| Tenant Filter
+|--------------------------------------------------------------------------
+|
+| Tenants must be activated in order to be visible
+|
+*/
+Route::filter('tenant', function()
+{
+    if ( ! in_array(Request::subdomain(), Config::get('app.subdomains')) )
+    {
+        App::abort(404);
+    }
+
+    if (Session::has('tenant'))
+    {
+        if (! Session::get('tenant.active'))
+        {
+            var_dump(Session::get('tenant'));
+            die('soon');
+        }
+        
+        return null;
+    }
+
+    Session::put('tenant', App::make('Setting')->getSessionData());
+
+    return null;
+  
 });

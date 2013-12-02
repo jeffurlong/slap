@@ -114,6 +114,10 @@ return array(
 		'Illuminate\View\ViewServiceProvider',
 		'Illuminate\Workbench\WorkbenchServiceProvider',
 
+		'Krucas\Notification\NotificationServiceProvider',
+		
+		'Slap\Storage\StorageServiceProvider',
+
 	),
 
 	/*
@@ -178,6 +182,8 @@ return array(
 		'URL'             => 'Illuminate\Support\Facades\URL',
 		'Validator'       => 'Illuminate\Support\Facades\Validator',
 		'View'            => 'Illuminate\Support\Facades\View',
+
+		'Notification' 	=> 'Krucas\Notification\Facades\Notification',
 
 	),
 

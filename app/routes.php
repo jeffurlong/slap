@@ -10,8 +10,17 @@
 | and give it the Closure to execute when that URI is requested.
 |
 */
-
-Route::get('/', function()
+if ( ! Request::subdomain() )
 {
-        return View::make('www.index');
+    Route::get('/', function()
+    {
+            return View::make('www.index');
+    });
+}
+
+Route::group( array('before' => 'tenant'), function()
+{
+    Route::controller('account', 'tenant\AccountController');
+
+    Route::get('{slug?}', 'tenant\PageController@findBySlug');
 });

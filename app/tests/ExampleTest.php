@@ -28,10 +28,5 @@ class ExampleTest extends TestCase {
 		$this->assertEquals(null, $request->subdomain());
 	}
 
-	public function testRequestRespondsOK()
-	{
-		$response = $this->call('GET', '/');
-		$this->assertEquals('WTF', $response->getContent());
-	}
 
 }

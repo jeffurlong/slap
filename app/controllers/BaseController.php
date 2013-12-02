@@ -3,6 +3,14 @@
 class BaseController extends Controller {
 
 	/**
+	 * Calls CSRF filter on all posts
+	 */
+	public function __construct()
+	{
+	    $this->filter('before', 'csrf')->on('post');
+	}
+
+	/**
 	 * Setup the layout used by the controller.
 	 *
 	 * @return void

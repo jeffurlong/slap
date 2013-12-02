@@ -20,6 +20,43 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	protected $hidden = array('password');
 
 	/**
+	 * Determines if the user has the given role
+	 * @param  string 	$name 	Role name
+	 * @return boolean
+	 */
+	public function hasRole($name)
+	{
+        foreach ($this->roles as $role)
+        {
+            if( $role->name === $name )
+            {
+                return true;
+            }
+        }
+
+        return false;
+   }
+
+	/**
+	 * 1:1 Association to Person
+	 * @return BelongsTo
+	 */
+	public function person()
+	{
+		return $this->belongsTo('Person');
+	}
+
+	/**
+	 * M:M Association to Role
+	 * @return BelongsToMany
+	 */
+	public function roles()
+    {
+        return $this->belongsToMany('Role');
+    }
+
+
+	/**
 	 * Get the unique identifier for the user.
 	 *
 	 * @return mixed
