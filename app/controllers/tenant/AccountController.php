@@ -1,7 +1,6 @@
 <?php
 namespace tenant;
 
-use View, Auth, Input, Notification, Lang, Redirect, Session, App, Password, Hash;
 use \Slap\Storage\User\UserRepositoryInterface as User;
 use \Slap\Storage\Person\PersonRepositoryInterface as Person;
 
@@ -37,7 +36,7 @@ class AccountController extends \BaseController
      */
     public function getLogin()
     {
-        return View::make('tenant.login');
+        return \View::make('tenant.login');
     }
 
     /**
@@ -46,17 +45,36 @@ class AccountController extends \BaseController
      */
     public function postLogin()
     {
-        if ( ! Auth::attempt(array( 
+        $v = new \Slap\Services\Validation\User;
+        if($v->passes())
+        {
+            dd('passed');
+        }
+        else
+        {
+            \Notification::container()->error($v->getErrors()->toArray());
+
+            // dd($v->getErrors());
+
+            // foreach($v->getErrors() as $label => $errors)
+            // {
+            //     $errors 
+            //    \Notification::error($errors[0]); 
+            // }
+            
+            return \Redirect::back()->withInput();
+        }
+        if ( ! \Auth::attempt(array( 
             'email' => Input::get('email'),
             'password' => Input::get('password')
         )))
         {
-            Notification::error(Lang::get('account.invalid'));
+            \Notification::error(Lang::get('account.invalid'));
 
-            return Redirect::back()->withInput();
+            return \Redirect::back()->withInput();
         }
 
-        return $this->redirectByRole(Auth::user());
+        return $this->redirectByRole(\Auth::user());
     }
 
     /**
@@ -65,7 +83,7 @@ class AccountController extends \BaseController
      */
     public function getSignup()
     {
-        return View::make('tenant.signup');
+        return \View::make('tenant.signup');
     }
 
     /**
@@ -75,9 +93,9 @@ class AccountController extends \BaseController
     public function postSignup()
     {
         try {
-            $person = $this->person->create(Input::all());
+            $person = $this->person->create(\Input::all());
 
-            $user = $this->user->create(Input::all());
+            $user = $this->user->create(\Input::all());
         }
         catch(\Exception $e)
         {
@@ -94,9 +112,9 @@ class AccountController extends \BaseController
             throw $e;
         }
 
-        Auth::login($user);
+        \Auth::login($user);
 
-        return Redirect::to('member');
+        return \Redirect::to('member');
     }
 
     /**
@@ -105,9 +123,9 @@ class AccountController extends \BaseController
      */
     public function getLogout()
     {
-        Auth::logout();
+        \Auth::logout();
 
-        return View::make('tenant.logout');
+        return \View::make('tenant.logout');
     }
 
     /**
@@ -117,14 +135,14 @@ class AccountController extends \BaseController
      */
     public function getForgot()
     {
-        if (Session::has('success') or Session::has('error'))
+        if (\Session::has('success') or \Session::has('error'))
         {
-            Notification::info(Lang::get('reminders.sent'));
+            \Notification::info(\Lang::get('reminders.sent'));
 
-            return Redirect::to('account/login')->withInput();
+            return \Redirect::to('account/login')->withInput();
         }
 
-        return View::make('tenant.forgot');
+        return \View::make('tenant.forgot');
     }
 
     /**
@@ -133,9 +151,9 @@ class AccountController extends \BaseController
      */
     public function postForgot()
     {
-        return Password::remind(
+        return \Password::remind(
 
-            array('email' => Input::get('email')),
+            array('email' => \Input::get('email')),
             
             function ($message, $user)
             {
@@ -151,12 +169,12 @@ class AccountController extends \BaseController
      */
     public function getReset($token = null)
     {
-        if(Session::has('error'))
+        if( \Session::has('error') )
         {
-            Notification::errorInstant(Lang::get('account.'.Session::get('reason')));
+            \Notification::errorInstant(\Lang::get('account.'.\Session::get('reason')));
         }
 
-        return View::make('tenant.reset')->with('token', $token);
+        return \View::make('tenant.reset')->with('token', $token);
     }
 
     /**
@@ -167,20 +185,20 @@ class AccountController extends \BaseController
     public function postReset()
     {
         $data = array(
-            'email'                 => Input::get('email'),
-            'password'              => Input::get('password'),
-            'password_confirmation' => Input::get('password_confirmation')
+            'email'                 => \Input::get('email'),
+            'password'              => \Input::get('password'),
+            'password_confirmation' => \Input::get('password_confirmation')
         );
 
-        return Password::reset($data, function($user, $password)
+        return \Password::reset($data, function($user, $password)
         {
-            $user->password = Hash::make($password);
+            $user->password = \Hash::make($password);
 
             $user->save();
 
-            Auth::login($user);
+            \Auth::login($user);
 
-            return $this->redirectByRole(Auth::user());
+            return $this->redirectByRole(\Auth::user());
         });
     }
 
@@ -189,9 +207,9 @@ class AccountController extends \BaseController
         if ($user->hasRole('admin'))
         {
             die('redirect to admin');
-            return Redirect::intended('admin');
+            return \Redirect::intended('admin');
         }
         die('redirect to member');
-        return Redirect::intended('member');
+        return \Redirect::intended('member');
     }
 }

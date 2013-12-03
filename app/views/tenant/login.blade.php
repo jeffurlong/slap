@@ -10,7 +10,7 @@
 
 @section('content')
     
-    <form method="post">
+    <form method="post" novalidate>
 
         {{ Form::token() }}
     
