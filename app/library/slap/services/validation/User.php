@@ -1,32 +1,28 @@
 <?php
 namespace Slap\Services\Validation;
 
-class User extends Validator {
+class User extends Validation {
 
-    public static $rules = array(
-        'save' => array(
-            'email' => 'required|email',
-            'password' => 'min:8|required|confirmed',
-            'password_confirmation' => 'min:8|required',
-        ),
-        'create' => array(
-            'email' => 'required|email|unique:users',
-            'password' => 'min:8|required|confirmed',
-            'password_confirmation' => 'min:8|required',
-        ),
+    public function _construct()
+    {
+        $this->rules = array('email' => 'required|email');
 
-        'login' => array(
-            'email' => 'required|email',
-            'password' => 'required',
-        ),
+        parent::_construct();
+    }
 
-        'forgot' => array(
-            'email' => 'required|email',
-        ),
+    public function login()
+    {
+        $this->rules['password'] = 'required';
 
+        $this->validate();
+    }
 
-    );
+    public function reset()
+    {
+        $this->rules['password'] = 'min:8|required|confirmed';
+        $this->rules['password_confirmation'] = 'min:8|required';
 
-
+        $this->validate();
+    }
 
 }

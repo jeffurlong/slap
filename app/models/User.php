@@ -2,7 +2,7 @@
 
 use Illuminate\Auth\UserInterface;
 use Illuminate\Auth\Reminders\RemindableInterface;
-
+use Slap\Services\Validation\User as Validation;
 class User extends Eloquent implements UserInterface, RemindableInterface {
 
 	/**
@@ -19,23 +19,6 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	 */
 	protected $hidden = array('password');
 
-	/**
-	 * Determines if the user has the given role
-	 * @param  string 	$name 	Role name
-	 * @return boolean
-	 */
-	public function hasRole($name)
-	{
-        foreach ($this->roles as $role)
-        {
-            if( $role->name === $name )
-            {
-                return true;
-            }
-        }
-
-        return false;
-   }
 
 	/**
 	 * 1:1 Association to Person
@@ -55,10 +38,40 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
         return $this->belongsToMany('Role');
     }
 
+    public static function login($input)
+    {
+    	try
+    	{
+    		Validation::make()->login();
+    	}
+    	catch(ValidationException $errors)
+    	{
+    		throw $errors;
+    	}
+
+    	return \Auth::attempt(array('email' => $input['email'],'password' => $input['password']));
+    }
+
+	/**
+	 * Determines if the user has the given role
+	 * @param  string 	$name 	Role name
+	 * @return boolean
+	 */
+	public function hasRole($name)
+	{
+        foreach ($this->roles as $role)
+        {
+            if( $role->name === $name )
+            {
+                return true;
+            }
+        }
+
+        return false;
+   	}
 
 	/**
 	 * Get the unique identifier for the user.
-	 *
 	 * @return mixed
 	 */
 	public function getAuthIdentifier()
@@ -68,7 +81,6 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 
 	/**
 	 * Get the password for the user.
-	 *
 	 * @return string
 	 */
 	public function getAuthPassword()
@@ -78,7 +90,6 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 
 	/**
 	 * Get the e-mail address where password reminders are sent.
-	 *
 	 * @return string
 	 */
 	public function getReminderEmail()

@@ -48,6 +48,20 @@ class AccountController extends \BaseController
      */
     public function postLogin()
     {
+        try
+        {
+            if ( ! $this->user->login(Input::get('email'), Input::get('password')))
+            {
+                Notification::error(Lang::get('account.invalid'));
+
+                return Redirect::back()->withInput();
+            }
+        }
+        catch(ValidationException $errors)
+        {
+            Notification::error($errors->get());
+        }
+/*
         if( ! $this->validates('login'))
         {
             return Redirect::back()->withInput();
@@ -62,7 +76,7 @@ class AccountController extends \BaseController
 
             return Redirect::back()->withInput();
         }
-
+*/
         return $this->redirectByRole(Auth::user());
     }
 
