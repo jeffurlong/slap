@@ -1,16 +1,21 @@
 <?php
 namespace Slap\Services\Validation;
 
-class User extends Validator {
+class Auth extends Validator {
 
     public static $rules = array(
+
         'save' => array(
-            'email' => 'required|email',
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'email' => 'required|email|unique:users',
+            'phone' => 'required',
             'password' => 'min:8|required|confirmed',
             'password_confirmation' => 'min:8|required',
         ),
-        'create' => array(
-            'email' => 'required|email|unique:users',
+
+        'reset' => array(
+            'email' => 'required|email',
             'password' => 'min:8|required|confirmed',
             'password_confirmation' => 'min:8|required',
         ),
@@ -24,9 +29,6 @@ class User extends Validator {
             'email' => 'required|email',
         ),
 
-
     );
-
-
 
 }

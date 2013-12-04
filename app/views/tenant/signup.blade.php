@@ -9,7 +9,7 @@
 @stop
 
 @section('content')
-    <form method="post">
+    <form method="post" novalidate>
         {{ Form::token() }}
         <label for="first_name">First Name</label>
         <input type="text" id="first_name" name="first_name" required>

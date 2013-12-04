@@ -1,8 +1,11 @@
 <?php
 namespace tenant;
 
-use \Slap\Storage\User\UserRepositoryInterface as User;
-use \Slap\Storage\Person\PersonRepositoryInterface as Person;
+use View, Notification, Redirect, Auth, Input, Session, Lang, Password, Hash, Exception;
+
+use Slap\Storage\User\UserRepositoryInterface as User;
+use Slap\Storage\Person\PersonRepositoryInterface as Person;
+use Slap\Services\Validation\Auth as AuthValidator;
 
 class AccountController extends \BaseController
 {
@@ -36,7 +39,7 @@ class AccountController extends \BaseController
      */
     public function getLogin()
     {
-        return \View::make('tenant.login');
+        return View::make('tenant.login');
     }
 
     /**
@@ -45,116 +48,56 @@ class AccountController extends \BaseController
      */
     public function postLogin()
     {
-        $v = new \Slap\Services\Validation\User;
-        if($v->passes())
+        if( ! $this->validates('login'))
         {
-            dd('passed');
+            return Redirect::back()->withInput();
         }
-        else
-        {
-            \Notification::container()->error($v->getErrors()->toArray());
 
-            // dd($v->getErrors());
-
-            // foreach($v->getErrors() as $label => $errors)
-            // {
-            //     $errors 
-            //    \Notification::error($errors[0]); 
-            // }
-            
-            return \Redirect::back()->withInput();
-        }
-        if ( ! \Auth::attempt(array( 
+        if ( ! Auth::attempt(array(
             'email' => Input::get('email'),
             'password' => Input::get('password')
         )))
         {
-            \Notification::error(Lang::get('account.invalid'));
+            Notification::error(Lang::get('account.invalid'));
 
-            return \Redirect::back()->withInput();
+            return Redirect::back()->withInput();
         }
 
-        return $this->redirectByRole(\Auth::user());
+        return $this->redirectByRole(Auth::user());
     }
 
-    /**
-     * Get the sign up view
-     * @return View
-     */
-    public function getSignup()
-    {
-        return \View::make('tenant.signup');
-    }
-
-    /**
-     * Create the new user and log them in
-     * @return Redirect
-     */
-    public function postSignup()
-    {
-        try {
-            $person = $this->person->create(\Input::all());
-
-            $user = $this->user->create(\Input::all());
-        }
-        catch(\Exception $e)
-        {
-            if (isset($person))
-            {
-                $person->forceDelete();
-            }
-
-            if (isset($user))
-            {
-                $user->forceDelete();
-            }
-
-            throw $e;
-        }
-
-        \Auth::login($user);
-
-        return \Redirect::to('member');
-    }
-
-    /**
-     * Log the user out and return the logout view.
-     * @return View
-     */
-    public function getLogout()
-    {
-        \Auth::logout();
-
-        return \View::make('tenant.logout');
-    }
-
-    /**
-     * Get the forgot password view. If the request has been redirected here 
+     /**
+     * Get the forgot password view. If the request has been redirected here
      * from a post, notify. We notify on success or error for security.
      * @return Redirect | View
      */
     public function getForgot()
     {
-        if (\Session::has('success') or \Session::has('error'))
+        if (Session::has('success') or Session::has('error'))
         {
-            \Notification::info(\Lang::get('reminders.sent'));
+            Notification::info(Lang::get('account.reminders.sent'));
 
-            return \Redirect::to('account/login')->withInput();
+            return Redirect::to('account/login')->withInput();
         }
 
-        return \View::make('tenant.forgot');
+        return View::make('tenant.forgot');
     }
 
-    /**
+      /**
      * Send password reminder. Password:remind redirects back to forgot view.
      * @return Redirect
      */
     public function postForgot()
     {
-        return \Password::remind(
+        if( ! $this->validates('forgot'))
+        {
+            return Redirect::back()->withInput();
+        }
 
-            array('email' => \Input::get('email')),
-            
+        return Password::remind(
+
+            array('email' => Input::get('email')),
+
             function ($message, $user)
             {
                 $message->subject('Password reminder');
@@ -169,12 +112,12 @@ class AccountController extends \BaseController
      */
     public function getReset($token = null)
     {
-        if( \Session::has('error') )
+        if( Session::has('error') )
         {
-            \Notification::errorInstant(\Lang::get('account.'.\Session::get('reason')));
+            Notification::errorInstant(Lang::get('account.'.Session::get('reason')));
         }
 
-        return \View::make('tenant.reset')->with('token', $token);
+        return View::make('tenant.reset')->with('token', $token);
     }
 
     /**
@@ -184,32 +127,129 @@ class AccountController extends \BaseController
      */
     public function postReset()
     {
-        $data = array(
-            'email'                 => \Input::get('email'),
-            'password'              => \Input::get('password'),
-            'password_confirmation' => \Input::get('password_confirmation')
-        );
-
-        return \Password::reset($data, function($user, $password)
+        if( ! $this->validates('reset'))
         {
-            $user->password = \Hash::make($password);
+            return Redirect::back()->withInput();
+        }
+
+        return Password::reset(array('email' => Input::get('email')), function($user, $password)
+        {
+            $user->password = Hash::make($password);
 
             $user->save();
 
-            \Auth::login($user);
+            Auth::login($user);
 
-            return $this->redirectByRole(\Auth::user());
+            return $this->redirectByRole(Auth::user());
         });
     }
+
+    /**
+     * Get the sign up view
+     * @return View
+     */
+    public function getSignup()
+    {
+        return View::make('tenant.signup');
+    }
+
+    /**
+     * Create the new user and log them in
+     * @return Redirect
+     */
+    public function postSignup()
+    {
+        if( ! $this->validates())
+        {
+            return Redirect::back()->withInput();
+        }
+
+        try
+        {
+            $person = $this->createPerson(Input::except(array('password', 'confirm_password', '_token')));
+
+            $user = $this->user->create(array(
+                'person_id' => $person->id,
+                'email' => $person->email,
+                'password' => Hash::make(Input::get('password')),
+            ));
+
+            $user->roles()->attach(3);
+
+            $this->sendSignupEmail($person);
+
+        }
+        catch(Exception $e)
+        {
+            if (isset($person))
+            {
+                $person->forceDelete();
+            }
+
+            if (isset($user))
+            {
+                $user->roles()->detach();
+
+                $user->forceDelete();
+            }
+
+            throw $e;
+        }
+
+        Auth::login($user);
+
+        return Redirect::to('member');
+    }
+
+
+
+    private function sendSignupEmail($person)
+    {
+        Mail::send(
+            'emails.auth.signup',
+            array('email' => $person->email),
+            function($m) use ($person, $params)
+            {
+                $m->to($person->email, $person->first_name.' '.$person->last_name)->subject(Session::get('tenant.name').' Account');
+            }
+        );
+    }
+
+
+    /**
+     * Log the user out and return the logout view.
+     * @return View
+     */
+    public function getLogout()
+    {
+        Auth::logout();
+
+        return View::make('tenant.logout');
+    }
+
 
     private function redirectByRole($user)
     {
         if ($user->hasRole('admin'))
         {
             die('redirect to admin');
-            return \Redirect::intended('admin');
+            return Redirect::intended('admin');
         }
         die('redirect to member');
-        return \Redirect::intended('member');
+        return Redirect::intended('member');
+    }
+
+    private function validates($context = 'save')
+    {
+        $v = new AuthValidator;
+
+        if( ! $v->passes($context))
+        {
+            Notification::error($v->getErrors()->toArray());
+
+            return false;
+        }
+
+        return true;
     }
 }

@@ -9,7 +9,7 @@
 @stop
 
 @section('content')
-    <form method="post">
+    <form method="post" novalidate>
         {{ Form::token() }}
         <label for="email">Email Addres</label>
         <input required type="email" id="email" name="email" value="{{ Input::old('email') }}">

@@ -12,19 +12,19 @@ abstract class Validator {
         $this->input = $input ?: \Input::all();
     }
 
-    public function passes($new = false)
+    public function passes($key = null)
     {
-        $merge = $new ? static::$rules['create'] : static::$rules['update'];
+        $rules = ($key and array_key_exists($key, static::$rules)) ? static::$rules[$key] : static::$rules['save'];
 
-        $validation = \Validator::make($this->input, array_merge(static::$rules['save'], $merge));           
+        $validation = \Validator::make($this->input, $rules);
 
-        if($validation->passes()) 
+        if($validation->passes())
         {
             return true;
         }
-     
+
         $this->errors = $validation->messages();
- 
+
         return false;
     }
 
