@@ -63,6 +63,7 @@ abstract class Validation {
 
         if($this->validator->fails())
         {
+            
             throw new ValidationException($this->validator);
         }
     }

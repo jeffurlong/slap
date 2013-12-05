@@ -6,6 +6,7 @@ use View, Notification, Redirect, Auth, Input, Session, Lang, Password, Hash, Ex
 use Controllers\BaseController;
 use Models\Account;
 use Slap\Exceptions\ValidationException;
+use Slap\Exceptions\AuthException;
 use Slap\Services\Validation\Account as Validator;
 
 class AccountController extends BaseController
@@ -43,24 +44,22 @@ class AccountController extends BaseController
     {
         try
         {
-            $this->validate('login');
+            $user = $this->model->login(Input::get('email'), Input::get('password'));   
         }
         catch(ValidationException $e)
         {
+            Notification::error($e->errors());
+
             return Redirect::back()->withInput();
         }
-
-
-        if ( ! Auth::attempt(array(
-            'email' => Input::get('email'),
-            'password' => Input::get('password'))))
+        catch(AuthException $e)
         {
-            Notification::error(Lang::get('account.invalid'));
+            Notification::error(Lang::get($e->getMessage()));            
 
             return Redirect::back()->withInput();
         }
-
-         return $this->redirectByRole(Auth::user());
+        
+         return $this->redirectByRole($user);
     }
 
      /**
@@ -88,22 +87,16 @@ class AccountController extends BaseController
     {
         try
         {
-            $this->validate();
+            $response = $this->model->forgot(Input::get('email'));
         }
         catch(ValidationException $e)
         {
+            Notification::error($e->errors());
+            
             return Redirect::back()->withInput();
         }
 
-        return Password::remind(
-
-            array('email' => Input::get('email')),
-
-            function ($message, $user)
-            {
-                $message->subject('Password reminder');
-            }
-        );
+        return $response;
     }
 
     /**
@@ -130,7 +123,7 @@ class AccountController extends BaseController
     {
         try
         {
-            $this->validate('reset');
+            $this->model->validate('reset');
         }
         catch(ValidationException $e)
         {
@@ -166,7 +159,7 @@ class AccountController extends BaseController
     {
         try
         {
-           $this->validate('signup');
+           $this->model->validate('signup');
         }
         catch(ValidationException $e)
         {
@@ -221,20 +214,6 @@ class AccountController extends BaseController
         return View::make('tenant.logout');
     }
 
-    private function validate($method = 'validate')
-    {
-        try
-        {
-           Validator::make()->$method();
-        }
-        catch(ValidationException $e)
-        {
-            Notification::error($e->errors());
-
-            throw $e;
-        }
-    }
-
     private function redirectByRole($user)
     {
         if ($user->hasRole('admin'))
@@ -245,8 +224,6 @@ class AccountController extends BaseController
         die('redirect to member');
         return Redirect::intended('member');
     }
-
-
 
     private function sendSignupEmail($person)
     {

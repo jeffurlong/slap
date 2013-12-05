@@ -1,7 +1,7 @@
 <?php
 namespace Slap\Storage\Person;
 
-use Person;
+use Models\Person;
 
 class EloquentPersonRepository implements PersonRepositoryInterface {
 

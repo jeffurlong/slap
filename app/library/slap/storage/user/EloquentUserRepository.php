@@ -1,7 +1,7 @@
 <?php
 namespace Slap\Storage\User;
 
-use User;
+use Models\User;
 
 class EloquentUserRepository implements UserRepositoryInterface {
 

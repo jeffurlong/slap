@@ -1,7 +1,7 @@
 <?php 
 namespace Slap\Storage\Page;
 
-use Page;
+use Models\Page;
 
 class EloquentPageRepository implements PageRepositoryInterface {
 

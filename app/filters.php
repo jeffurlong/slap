@@ -110,7 +110,7 @@ Route::filter('tenant', function()
         return null;
     }
 
-    Session::put('tenant', App::make('Setting')->getSessionData());
+    Session::put('tenant', App::make('Models\Setting')->getSessionData());
 
     return null;
   
