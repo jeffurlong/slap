@@ -48,6 +48,7 @@ abstract class Validation {
 
     public static function make($input = null)
     {
+
         return new static($input);
     }
 

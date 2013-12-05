@@ -1,6 +1,7 @@
 <?php
+namespace Models;
 
-class Setting extends Eloquent {
+class Setting extends \Eloquent {
 
     /**
      * Keys included in the session

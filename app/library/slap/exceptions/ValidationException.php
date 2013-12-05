@@ -1,10 +1,12 @@
-<?php 
+<?php
 namespace Slap\Exceptions;
 
-class ValidationException extends \RuntimeException {
+use Illuminate\Validation\Validator;
+
+class ValidationException extends \Exception {
 
     /**
-     * Errors object.
+     * Messages object.
      * @var Laravel\Messages
      */
     private $errors;
@@ -16,7 +18,7 @@ class ValidationException extends \RuntimeException {
      */
     public function __construct($container)
     {
-        $this->errors = ($container instanceof \Validator) ? $container->errors : $container;
+        $this->errors = ($container instanceof Validator) ? $container->errors() : $container;
 
         parent::__construct(null);
     }
@@ -25,9 +27,15 @@ class ValidationException extends \RuntimeException {
      * Gets the errors object.
      * @return Laravel\Messages
      */
-    public function get()
+    public function errors()
+    {
+        return $this->errors->toArray();
+    }
+
+    public function rawErrors()
     {
         return $this->errors;
     }
 
 }
+

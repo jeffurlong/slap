@@ -1,5 +1,6 @@
 <?php
+namespace Models;
 
-class Page extends Eloquent {
+class Page extends \Eloquent {
 
 }

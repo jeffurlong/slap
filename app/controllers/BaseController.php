@@ -1,6 +1,7 @@
 <?php
+namespace Controllers;
 
-class BaseController extends Controller {
+class BaseController extends \Controller {
 
 	/**
 	 * Calls CSRF filter on all posts

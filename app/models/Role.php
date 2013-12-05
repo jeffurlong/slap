@@ -1,5 +1,6 @@
 <?php
+namespace Models;
 
-class Role extends Eloquent {
+class Role extends \Eloquent {
 
 }

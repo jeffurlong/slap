@@ -20,7 +20,7 @@ if ( ! Request::subdomain() )
 
 Route::group( array('before' => 'tenant'), function()
 {
-    Route::controller('account', 'tenant\AccountController');
+    Route::controller('account', 'Controllers\Tenant\AccountController');
 
-    Route::get('{slug?}', 'tenant\PageController@findBySlug');
+    Route::get('{slug?}', 'Controllers\Tenant\PageController@findBySlug');
 });

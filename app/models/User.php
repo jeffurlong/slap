@@ -1,9 +1,10 @@
 <?php
+namespace Models;
 
 use Illuminate\Auth\UserInterface;
 use Illuminate\Auth\Reminders\RemindableInterface;
-use Slap\Services\Validation\User as Validation;
-class User extends Eloquent implements UserInterface, RemindableInterface {
+
+class User extends \Eloquent implements UserInterface, RemindableInterface {
 
 	/**
 	 * The database table used by the model.
@@ -38,19 +39,6 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
         return $this->belongsToMany('Role');
     }
 
-    public static function login($input)
-    {
-    	try
-    	{
-    		Validation::make()->login();
-    	}
-    	catch(ValidationException $errors)
-    	{
-    		throw $errors;
-    	}
-
-    	return \Auth::attempt(array('email' => $input['email'],'password' => $input['password']));
-    }
 
 	/**
 	 * Determines if the user has the given role

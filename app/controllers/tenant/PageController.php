@@ -1,9 +1,9 @@
-<?php 
-namespace tenant;
+<?php
+namespace Controllers\Tenant;
 
 use View;
 
-class PageController extends \BaseController {
+class PageController extends \Controllers\BaseController {
 
     protected $page;
 
@@ -15,8 +15,8 @@ class PageController extends \BaseController {
     public function findBySlug($slug = null)
     {
         $page = $this->page->findBySlug($slug);
-        
+
         return View::make('tenant.default', compact('page'));
     }
-    
+
 }

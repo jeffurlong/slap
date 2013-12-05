@@ -1,36 +1,29 @@
 <?php
-namespace tenant;
+namespace Controllers\Tenant;
 
-use View, Notification, Redirect, Auth, Input, Session, Lang, Password, Hash, Exception;
+use View, Notification, Redirect, Auth, Input, Session, Lang, Password, Hash, Exception, Mail;
 
-use Slap\Storage\User\UserRepositoryInterface as User;
-use Slap\Storage\Person\PersonRepositoryInterface as Person;
-use Slap\Services\Validation\Auth as AuthValidator;
+use Controllers\BaseController;
+use Models\Account;
+use Slap\Exceptions\ValidationException;
+use Slap\Services\Validation\Account as Validator;
 
-class AccountController extends \BaseController
+class AccountController extends BaseController
 {
     /**
-     * User
-     * @var UserRepositoryInterface
+     * Model
+     * @var Account
      */
-    protected $user;
-
-    /**
-     * Person
-     * @var PersonRepositoryInterface
-     */
-    protected $person;
+    protected $model;
 
     /**
      * Create a new controller instance and injects the repository interface
      * @param UserRepositoryInterface $users
      * @return UserRepositoryInterface
      */
-    public function __construct(User $user, Person $person)
+    public function __construct(Account $model)
     {
-        $this->user = $user;
-
-        $this->person = $person;
+        $this->model = $model;
     }
 
     /**
@@ -50,34 +43,24 @@ class AccountController extends \BaseController
     {
         try
         {
-            if ( ! $this->user->login(Input::get('email'), Input::get('password')))
-            {
-                Notification::error(Lang::get('account.invalid'));
-
-                return Redirect::back()->withInput();
-            }
+            $this->validate('login');
         }
-        catch(ValidationException $errors)
-        {
-            Notification::error($errors->get());
-        }
-/*
-        if( ! $this->validates('login'))
+        catch(ValidationException $e)
         {
             return Redirect::back()->withInput();
         }
 
+
         if ( ! Auth::attempt(array(
             'email' => Input::get('email'),
-            'password' => Input::get('password')
-        )))
+            'password' => Input::get('password'))))
         {
             Notification::error(Lang::get('account.invalid'));
 
             return Redirect::back()->withInput();
         }
-*/
-        return $this->redirectByRole(Auth::user());
+
+         return $this->redirectByRole(Auth::user());
     }
 
      /**
@@ -97,13 +80,17 @@ class AccountController extends \BaseController
         return View::make('tenant.forgot');
     }
 
-      /**
+    /**
      * Send password reminder. Password:remind redirects back to forgot view.
      * @return Redirect
      */
     public function postForgot()
     {
-        if( ! $this->validates('forgot'))
+        try
+        {
+            $this->validate();
+        }
+        catch(ValidationException $e)
         {
             return Redirect::back()->withInput();
         }
@@ -141,7 +128,11 @@ class AccountController extends \BaseController
      */
     public function postReset()
     {
-        if( ! $this->validates('reset'))
+        try
+        {
+            $this->validate('reset');
+        }
+        catch(ValidationException $e)
         {
             return Redirect::back()->withInput();
         }
@@ -173,46 +164,86 @@ class AccountController extends \BaseController
      */
     public function postSignup()
     {
-        if( ! $this->validates())
+        try
         {
+           $this->validate('signup');
+        }
+        catch(ValidationException $e)
+        {
+
             return Redirect::back()->withInput();
         }
 
         try
         {
-            $person = $this->createPerson(Input::except(array('password', 'confirm_password', '_token')));
+            // $person = $this->person->create(Input::except(array('password', 'confirm_password', '_token')));
 
-            $user = $this->user->create(array(
-                'person_id' => $person->id,
-                'email' => $person->email,
-                'password' => Hash::make(Input::get('password')),
-            ));
+            // $user = $this->user->create(array(
+            //     'person_id' => $person->id,
+            //     'email' => $person->email,
+            //     'password' => Hash::make(Input::get('password')),
+            // ));
 
-            $user->roles()->attach(3);
+            // $user->roles()->attach(3);
 
-            $this->sendSignupEmail($person);
-
+            // $this->sendSignupEmail($person);
         }
         catch(Exception $e)
         {
-            if (isset($person))
-            {
-                $person->forceDelete();
-            }
+            // if (isset($person))
+            // {
+            //     $person->forceDelete();
+            // }
 
-            if (isset($user))
-            {
-                $user->roles()->detach();
+            // if (isset($user))
+            // {
+            //     $user->roles()->detach();
 
-                $user->forceDelete();
-            }
+            //     $user->forceDelete();
+            // }
 
             throw $e;
         }
 
-        Auth::login($user);
+        // Auth::login($user);
 
-        return Redirect::to('member');
+        return $this->redirectByRole(Auth::user());
+    }
+
+    /**
+     * Log the user out and return the logout view.
+     * @return View
+     */
+    public function getLogout()
+    {
+        Auth::logout();
+
+        return View::make('tenant.logout');
+    }
+
+    private function validate($method = 'validate')
+    {
+        try
+        {
+           Validator::make()->$method();
+        }
+        catch(ValidationException $e)
+        {
+            Notification::error($e->errors());
+
+            throw $e;
+        }
+    }
+
+    private function redirectByRole($user)
+    {
+        if ($user->hasRole('admin'))
+        {
+            die('redirect to admin');
+            return Redirect::intended('admin');
+        }
+        die('redirect to member');
+        return Redirect::intended('member');
     }
 
 
@@ -229,41 +260,4 @@ class AccountController extends \BaseController
         );
     }
 
-
-    /**
-     * Log the user out and return the logout view.
-     * @return View
-     */
-    public function getLogout()
-    {
-        Auth::logout();
-
-        return View::make('tenant.logout');
-    }
-
-
-    private function redirectByRole($user)
-    {
-        if ($user->hasRole('admin'))
-        {
-            die('redirect to admin');
-            return Redirect::intended('admin');
-        }
-        die('redirect to member');
-        return Redirect::intended('member');
-    }
-
-    private function validates($context = 'save')
-    {
-        $v = new AuthValidator;
-
-        if( ! $v->passes($context))
-        {
-            Notification::error($v->getErrors()->toArray());
-
-            return false;
-        }
-
-        return true;
-    }
 }
