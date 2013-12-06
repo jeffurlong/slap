@@ -14,7 +14,10 @@ class PageController extends \Controllers\BaseController {
 
     public function findBySlug($slug = null)
     {
-        $page = $this->page->findBySlug($slug);
+        if ( ! $page = $this->page->findBySlug($slug))
+        {
+            \App::abort('404');
+        }
 
         return View::make('tenant.default', compact('page'));
     }

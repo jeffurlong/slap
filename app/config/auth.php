@@ -68,4 +68,10 @@ return array(
 
 	),
 
+	'roles'    => array(
+	    'owner'   => 1,
+	    'admin'   => 2,
+	    'member'  => 3,
+  	),
+
 );

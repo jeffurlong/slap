@@ -1,4 +1,4 @@
-<?php 
+<?php
 namespace Slap\Storage\Page;
 
 use Models\Page;
@@ -9,7 +9,7 @@ class EloquentPageRepository implements PageRepositoryInterface {
     {
         $slug = $slug ?: 'home';
 
-        return Page::where('slug', $slug)->firstOrFail();
+        return Page::where('slug', $slug)->first();
     }
 
 }

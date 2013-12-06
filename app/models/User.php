@@ -27,7 +27,7 @@ class User extends \Eloquent implements UserInterface, RemindableInterface {
 	 */
 	public function person()
 	{
-		return $this->belongsTo('Person');
+		return $this->belongsTo('Models\Person');
 	}
 
 	/**
@@ -36,7 +36,7 @@ class User extends \Eloquent implements UserInterface, RemindableInterface {
 	 */
 	public function roles()
     {
-        return $this->belongsToMany('Role');
+        return $this->belongsToMany('Models\Role');
     }
 
 

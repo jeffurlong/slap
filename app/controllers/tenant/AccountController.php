@@ -1,15 +1,13 @@
 <?php
 namespace Controllers\Tenant;
 
-use View, Notification, Redirect, Auth, Input, Session, Lang, Password, Hash, Exception, Mail;
+use View, Notification, Redirect, Input, Session, Lang, Mail;
 
-use Controllers\BaseController;
 use Models\Account;
 use Slap\Exceptions\ValidationException;
 use Slap\Exceptions\AuthException;
-use Slap\Services\Validation\Account as Validator;
 
-class AccountController extends BaseController
+class AccountController extends \Controllers\BaseController
 {
     /**
      * Model
@@ -18,9 +16,9 @@ class AccountController extends BaseController
     protected $model;
 
     /**
-     * Create a new controller instance and injects the repository interface
-     * @param UserRepositoryInterface $users
-     * @return UserRepositoryInterface
+     * Create a new controller instance and inject model
+     * @param Models\Account $model
+     * @return void
      */
     public function __construct(Account $model)
     {
@@ -37,14 +35,14 @@ class AccountController extends BaseController
     }
 
     /**
-     * Validate login credentials. Success redirects based on user role.
+     * Log the user in
      * @return Redirect
      */
     public function postLogin()
     {
         try
         {
-            $user = $this->model->login(Input::get('email'), Input::get('password'));   
+            $user = $this->model->login(Input::get('email'), Input::get('password'));
         }
         catch(ValidationException $e)
         {
@@ -54,17 +52,17 @@ class AccountController extends BaseController
         }
         catch(AuthException $e)
         {
-            Notification::error(Lang::get($e->getMessage()));            
+            Notification::error(Lang::get($e->getMessage()));
 
             return Redirect::back()->withInput();
         }
-        
+
          return $this->redirectByRole($user);
     }
 
      /**
      * Get the forgot password view. If the request has been redirected here
-     * from a post, notify. We notify on success or error for security.
+     * from a post then notify and redirect. We notify on success or error for security.
      * @return Redirect | View
      */
     public function getForgot()
@@ -80,7 +78,7 @@ class AccountController extends BaseController
     }
 
     /**
-     * Send password reminder. Password:remind redirects back to forgot view.
+     * Send password reminder.
      * @return Redirect
      */
     public function postForgot()
@@ -92,7 +90,7 @@ class AccountController extends BaseController
         catch(ValidationException $e)
         {
             Notification::error($e->errors());
-            
+
             return Redirect::back()->withInput();
         }
 
@@ -115,31 +113,27 @@ class AccountController extends BaseController
     }
 
     /**
-     * Reset user's password and log them in to appropriate app
-     * @param  string $token
+     * Reset user's password, log them in and redirect to appropriate app
      * @return Redirect
      */
     public function postReset()
     {
         try
         {
-            $this->model->validate('reset');
+            $user = $this->model->reset(Input::get('email'));
         }
         catch(ValidationException $e)
         {
+            Notification::error($e->errors());
+
             return Redirect::back()->withInput();
         }
-
-        return Password::reset(array('email' => Input::get('email')), function($user, $password)
+        catch(AuthException $e)
         {
-            $user->password = Hash::make($password);
+             return $user;
+        }
 
-            $user->save();
-
-            Auth::login($user);
-
-            return $this->redirectByRole(Auth::user());
-        });
+        return $this->redirectByRole($user);
     }
 
     /**
@@ -159,48 +153,24 @@ class AccountController extends BaseController
     {
         try
         {
-           $this->model->validate('signup');
+           $user = $this->model->signup(Input::all());
         }
         catch(ValidationException $e)
         {
+            Notification::error($e->errors());
+
+            return Redirect::back()->withInput();
+        }
+        catch(AuthException $e)
+        {
+            Notification::error(Lang::get($e->getMessage()));
 
             return Redirect::back()->withInput();
         }
 
-        try
-        {
-            // $person = $this->person->create(Input::except(array('password', 'confirm_password', '_token')));
+        return $this->redirectByRole($user);
 
-            // $user = $this->user->create(array(
-            //     'person_id' => $person->id,
-            //     'email' => $person->email,
-            //     'password' => Hash::make(Input::get('password')),
-            // ));
 
-            // $user->roles()->attach(3);
-
-            // $this->sendSignupEmail($person);
-        }
-        catch(Exception $e)
-        {
-            // if (isset($person))
-            // {
-            //     $person->forceDelete();
-            // }
-
-            // if (isset($user))
-            // {
-            //     $user->roles()->detach();
-
-            //     $user->forceDelete();
-            // }
-
-            throw $e;
-        }
-
-        // Auth::login($user);
-
-        return $this->redirectByRole(Auth::user());
     }
 
     /**
@@ -209,11 +179,16 @@ class AccountController extends BaseController
      */
     public function getLogout()
     {
-        Auth::logout();
+        $this->model->logout();
 
         return View::make('tenant.logout');
     }
 
+    /**
+     * Redirect based on users role
+     * @param  Models\User $user
+     * @return Redirect
+     */
     private function redirectByRole($user)
     {
         if ($user->hasRole('admin'))
@@ -223,18 +198,6 @@ class AccountController extends BaseController
         }
         die('redirect to member');
         return Redirect::intended('member');
-    }
-
-    private function sendSignupEmail($person)
-    {
-        Mail::send(
-            'emails.auth.signup',
-            array('email' => $person->email),
-            function($m) use ($person, $params)
-            {
-                $m->to($person->email, $person->first_name.' '.$person->last_name)->subject(Session::get('tenant.name').' Account');
-            }
-        );
     }
 
 }

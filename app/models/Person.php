@@ -7,7 +7,7 @@ class Person extends \Eloquent {
 
     public function user()
     {
-        return $this->hasOne('User');
+        return $this->hasOne('Models\User');
     }
 
 }
