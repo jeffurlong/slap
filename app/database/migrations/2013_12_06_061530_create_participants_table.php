@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePeopleTable extends Migration {
+class CreateParticipantsTable extends Migration {
 
 	/**
 	 * Run the migrations.
@@ -11,27 +11,22 @@ class CreatePeopleTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('people', function($table)
+		Schema::create('participants', function($table)
 		{
 			$table->engine = 'InnoDB';
 
 			$table->increments('id')->unsigned();
-			$table->integer('master_id')->unsigned()->nullable()->index();
+			$table->integer('parent_id')->unsigned();
 			$table->string('first_name');
 			$table->string('last_name');
-			$table->string('email');
-			$table->string('phone');
-			$table->string('street')->nullable();
-			$table->string('city')->nullable();
-			$table->string('state', 2)->nullable();
-			$table->string('zip', 10)->nullable();
-			$table->enum('gender', array('M', 'F'))->nullable();
-			$table->date('dob')->nullable();
+			$table->enum('gender', array('M', 'F'));
+			$table->date('dob');
 			$table->string('emergency_name')->nullable();
 			$table->string('emergency_phone')->nullable();
 			$table->timestamps();
 			$table->softDeletes();
-		
+			
+			$table->foreign('parent_id')->references('id')->on('users'); 
 		});
 	}
 
@@ -42,7 +37,11 @@ class CreatePeopleTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('people');
+		Schema::table('participants', function($table) {
+            $table->dropForeign('participants_parent_id_foreign');
+        });
+        
+		Schema::drop('participants');
 	}
 
 }
