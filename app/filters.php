@@ -18,7 +18,7 @@ App::before(function($request)
     {
         return Redirect::secure(Request::fullUrl());
     }
-    
+
 });
 
 
@@ -41,6 +41,14 @@ App::after(function($request, $response)
 Route::filter('auth', function()
 {
 	if (Auth::guest()) return Redirect::guest('login');
+});
+
+Route::filter('auth-admin', function()
+{
+    if (Auth::guest())
+    {
+        return Redirect::guest('admin/login');
+    }
 });
 
 
@@ -106,12 +114,12 @@ Route::filter('tenant', function()
             var_dump(Session::get('tenant'));
             die('soon');
         }
-        
+
         return null;
     }
 
     Session::put('tenant', App::make('Models\Setting')->getSessionData());
 
     return null;
-  
+
 });

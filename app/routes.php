@@ -18,9 +18,17 @@ if ( ! Request::subdomain() )
     });
 }
 
-Route::group( array('before' => 'tenant'), function()
+Route::group(array('before' => 'tenant'), function()
 {
-    Route::controller('account', 'Controllers\Tenant\AccountController');
+    Route::group(array('prefix' => 'admin'), function()
+    {
+        Route::get('/',                 'Controllers\Admin\DashboardController@getIndex');
+
+        Route::controller('login',      'Controllers\Admin\LoginController');
+        Route::controller('dashboard',  'Controllers\Admin\DashboardController');
+        Route::resource('page',         'Controllers\Admin\PageController');
+    });
+    // Route::controller('account', 'Controllers\Tenant\AccountController');
 
     Route::get('{slug?}', 'Controllers\Tenant\PageController@findBySlug');
 });

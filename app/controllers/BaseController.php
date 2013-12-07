@@ -1,6 +1,8 @@
 <?php
 namespace Controllers;
 
+use View;
+
 class BaseController extends \Controller {
 
 	/**
@@ -8,12 +10,11 @@ class BaseController extends \Controller {
 	 */
 	public function __construct()
 	{
-	    $this->filter('before', 'csrf')->on('post');
+	    $this->beforeFilter('csrf', array('on' => 'post'));
 	}
 
 	/**
 	 * Setup the layout used by the controller.
-	 *
 	 * @return void
 	 */
 	protected function setupLayout()
