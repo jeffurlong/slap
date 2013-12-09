@@ -1,7 +1,7 @@
-<?php
-namespace Controllers\Admin;
+<?php namespace Controllers\Admin;
 
-use View;
+use View, Notification, Redirect, Auth, Input, Lang;
+use Illuminate\Support\MessageBag;
 use Slap\Services\Validators\Login as Validator;
 
 class LoginController extends \Controllers\BaseController {
@@ -21,7 +21,7 @@ class LoginController extends \Controllers\BaseController {
     {
         $this->validator = $validator;
 
-        parent::__construct()
+        parent::__construct();
     }
 
     /**
@@ -34,6 +34,31 @@ class LoginController extends \Controllers\BaseController {
     }
 
     /**
+     * Log the admin in
+     * @return Redirect
+     */
+    public function postIndex()
+    {
+        if ( ! $this->validator->login())
+        {
+            return Redirect::back()->withInput()->withErrors($this->validator->errors());
+        }
+
+        if ( ! Auth::attempt(
+            array(
+                'email'     => Input::get('email'),
+                'password'  => Input::get('password')
+            )
+        ))
+        {
+            return Redirect::back()->withInput()->withErrors(Lang::get('account.invalid'));
+        }
+
+         return Redirect::intended('admin');
+    }
+
+
+    /**
      * Get the forgot password view. If the request has been redirected here
      * from a post then notify and redirect. We notify on success or error for
      * security.
@@ -43,54 +68,10 @@ class LoginController extends \Controllers\BaseController {
     {
         if (Session::has('success') or Session::has('error'))
         {
-            Notification::info(Lang::get('account.reminders.sent'));
-
-            return Redirect::to('admin/login')->withInput();
+            return Redirect::to('admin/login')->withInput()->with('message', Lang::get('account.reminders.sent'));
         }
 
         return View::make('admin.login.remind');
-    }
-
-    /**
-     * Get the reset view
-     * @return View
-     */
-    public function getReset()
-    {
-        if( Session::has('error') )
-        {
-            Notification::errorInstant(Lang::get('account.'.Session::get('reason')));
-        }
-
-        return View::make('admin.login.reset')->with('token', $token);
-    }
-
-    public function postIndex()
-    {
-        try
-        {
-            $this->validator->login();
-        }
-        catch(ValidationException $e)
-        {
-            Notification::error($e->errors());
-
-            return Redirect::back()->withInput();
-        }
-
-        if ( ! Auth::attempt(
-            array(
-                'email' => Input::get('email'),
-                'password' => Input::get('password')
-            )
-        ))
-        {
-            Notification::error(Lang::get('account.invalid'));
-
-            return Redirect::back()->withInput();
-        }
-
-         return Redirect::intended('admin');
     }
 
     /**
@@ -99,15 +80,9 @@ class LoginController extends \Controllers\BaseController {
      */
     public function postRemind()
     {
-        try
+        if ( ! $this->validator->validate())
         {
-             $this->validator->validate();
-        }
-        catch(ValidationException $e)
-        {
-            Notification::error($e->errors());
-
-            return Redirect::back()->withInput();
+            return Redirect::back()->withInput()->withErrors($this->validator->errors());
         }
 
         return Password::remind(array('email' => Input::get('email')),
@@ -118,20 +93,28 @@ class LoginController extends \Controllers\BaseController {
     }
 
     /**
+     * Get the reset view
+     * @return View
+     */
+    public function getReset()
+    {
+        if( Session::has('error') )
+        {
+            return Redirect::back()->withErrors(Lang::get('account.'.Session::get('reason')));
+        }
+
+        return View::make('admin.login.reset')->with('token', $token);
+    }
+
+    /**
      * Reset user's password, log them in and redirect to appropriate app
      * @return Redirect
      */
     public function postReset()
     {
-        try
+        if ( ! $this->validator->reset())
         {
-            $this->validator->reset();
-        }
-        catch(ValidationException $e)
-        {
-            Notification::error($e->errors());
-
-            return Redirect::back()->withInput();
+            return Redirect::back()->withInput()->withErrors($this->validator->errors());
         }
 
         Password::reset(array('email' => $email), function($user, $password)

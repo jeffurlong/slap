@@ -9,12 +9,11 @@
     <script src="/assets/js/modernizr.min.js"></script>
 </head>
 <body>
-    {{ Notification::showAll() }}
+    @include('partials.alerts')
 
     @yield('content')
 
     @yield('scripts')
-
 </body>
 </html>
 

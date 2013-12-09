@@ -1,9 +1,6 @@
 <?php
 namespace Slap\Services\Validators;
 
-use Input, Validator;
-use Slap\Exceptions\ValidationException;
-
 abstract class Validator {
 
     /**
@@ -11,6 +8,8 @@ abstract class Validator {
      * @var array
      */
     protected $input;
+
+    protected $errors;
 
     /**
      * Array of rules.
@@ -25,7 +24,7 @@ abstract class Validator {
      */
     public function __construct($input = null)
     {
-        $this->input = $input ?: Input::all();
+        $this->input = $input ?: \Input::all();
     }
 
     /**
@@ -35,12 +34,21 @@ abstract class Validator {
      */
     public function validate()
     {
-        $this->validator = Validator::make($this->input, $this->rules);
+        $v = \Validator::make($this->input, $this->rules);
 
-        if($this->validator->fails())
+        if($v->fails())
         {
-            throw new ValidationException($this->validator);
+            $this->errors = $v->messages();
+
+            return false;
         }
+
+        return true;
+    }
+
+    public function errors()
+    {
+        return $this->errors->toArray();
     }
 
 }
