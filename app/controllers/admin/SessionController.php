@@ -1,7 +1,6 @@
 <?php namespace Controllers\Admin;
 
 use View, Notification, Redirect, Auth, Input, Lang, Session, Password, Hash;
-use Slap\Validators\Session as Validator;
 
 class SessionController extends \Controllers\BaseController {
 
@@ -16,7 +15,7 @@ class SessionController extends \Controllers\BaseController {
      * @param Validator $validator
      * @return void
      */
-    public function __construct(Validator $validator)
+    public function __construct(\Slap\Validators\Session $validator)
     {
         $this->validator = $validator;
 
@@ -85,6 +84,7 @@ class SessionController extends \Controllers\BaseController {
 
         return Password::remind(array('email' => Input::get('email')),
             function ($message, $user) {
+                $user->url = 'admin/recover';
                 $message->subject('Password reminder');
             }
         );

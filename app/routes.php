@@ -32,7 +32,7 @@ Route::group(array('before' => 'tenant'), function()
     {
         Route::get('/',                 'Controllers\Admin\DashboardController@getIndex');
         Route::controller('dashboard',  'Controllers\Admin\DashboardController');
-        Route::resource('page',         'Controllers\Admin\PageController');
+        Route::resource('pages',         'Controllers\Admin\PageController');
     });
 
     Route::get('{slug?}', 'Controllers\Tenant\PageController@findBySlug');

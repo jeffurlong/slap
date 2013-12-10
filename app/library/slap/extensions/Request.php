@@ -19,5 +19,15 @@ class Request extends \Illuminate\Http\Request {
         return null;
     }
 
+    // public function view()
+    // {
+    //     if (isset($this->server['REQUEST_URI']))
+    //     {
+    //         $a = explode('/', trim($_SERVER['REQUEST_URI'], '/'));
+
+    //         return implode('_', $a);
+    //     }
+    // }
+
 
 }

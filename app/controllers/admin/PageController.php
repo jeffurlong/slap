@@ -2,6 +2,25 @@
 namespace Controllers\Admin;
 
 class PageController extends \Controllers\BaseController {
+	
+	/**
+     * Repository
+     * @var Page
+     */
+    private $repo;
+
+	/**
+     * Validator
+     * @var Validator
+     */
+    private $validator;
+
+	public function __construct(\Slap\Repositories\Interfaces\Page $repo, \Slap\Validators\Page $validator)
+	{
+		$this->repo = $repo;
+		
+		$this->validator = $validator;
+	}
 
 	/**
 	 * Display a listing of the resource.
@@ -10,7 +29,7 @@ class PageController extends \Controllers\BaseController {
 	 */
 	public function index()
 	{
-		dd(__method__);
+		
 	}
 
 	/**

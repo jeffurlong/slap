@@ -9,7 +9,7 @@
     <script src="/assets/js/modernizr.min.js"></script>
 </head>
 <body>
-    @include('partials.alerts')
+    @include('admin.partials.alerts')
 
     @yield('content')
 
