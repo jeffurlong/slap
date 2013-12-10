@@ -1,5 +1,4 @@
-<?php
-namespace Controllers\Tenant;
+<?php namespace Controllers\Tenant;
 
 use View;
 
@@ -7,7 +6,7 @@ class PageController extends \Controllers\BaseController {
 
     protected $page;
 
-    public function __construct(\Slap\Storage\Page\PageRepositoryInterface $page)
+    public function __construct(\Slap\Repositories\Interfaces\Page $page)
     {
         $this->page = $page;
     }

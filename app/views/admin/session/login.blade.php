@@ -1,4 +1,4 @@
-@extends('admin.layouts.login')
+@extends('admin.layouts.session')
 
 @section('content')
 
@@ -16,6 +16,6 @@
 
     </form>
 
-    <p><a href="/admin/login/remind">Forgot your password?</a></p>
+    <p><a href="/admin/forgot">Forgot your password?</a></p>
 
 @stop

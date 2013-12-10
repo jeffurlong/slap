@@ -1,4 +1,4 @@
-@extends('tenant.layouts.default')
+@extends('admin.layouts.session')
 
 @section('content')
     <h1>Reset Your Password</h1>
@@ -8,14 +8,13 @@
         <input type="hidden" name="token" value="{{ $token }}">
 
         <label for="email">Your Email Address</label>
-        <input type="email" id="email" name="email" required>
+        <input type="email" id="email" name="email" required value="{{ Input::old('email') }}">
 
         <label for="password">Enter a New Password</label>
         <input type="password" id="password" name="password" required>
 
         <label for="password_confirmation">Confirm Your Password</label>
         <input type="password" id="password_confirmation" name="password_confirmation" required>
-
 
         <button type="submit">Reset Password and Sign In</button>
     </form>

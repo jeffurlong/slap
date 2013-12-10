@@ -115,8 +115,8 @@ return array(
 		'Illuminate\Workbench\WorkbenchServiceProvider',
 
 		'Krucas\Notification\NotificationServiceProvider',
-		
-		'Slap\Storage\StorageServiceProvider',
+
+		'Slap\Repositories\RepositoryServiceProvider',
 
 	),
 

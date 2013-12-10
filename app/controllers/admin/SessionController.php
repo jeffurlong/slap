@@ -1,10 +1,9 @@
 <?php namespace Controllers\Admin;
 
-use View, Notification, Redirect, Auth, Input, Lang;
-use Illuminate\Support\MessageBag;
-use Slap\Services\Validators\Login as Validator;
+use View, Notification, Redirect, Auth, Input, Lang, Session, Password, Hash;
+use Slap\Validators\Session as Validator;
 
-class LoginController extends \Controllers\BaseController {
+class SessionController extends \Controllers\BaseController {
 
     /**
      * Validator
@@ -24,32 +23,30 @@ class LoginController extends \Controllers\BaseController {
         parent::__construct();
     }
 
-    /**
+     /**
      * Get the login view
      * @return View
      */
-    public function getIndex()
+    public function login()
     {
-        return View::make('admin.login.login');
+        return View::make('admin.session.login');
     }
 
-    /**
+     /**
      * Log the admin in
      * @return Redirect
      */
-    public function postIndex()
+    public function attempt()
     {
         if ( ! $this->validator->login())
         {
             return Redirect::back()->withInput()->withErrors($this->validator->errors());
         }
 
-        if ( ! Auth::attempt(
-            array(
-                'email'     => Input::get('email'),
-                'password'  => Input::get('password')
-            )
-        ))
+        if ( ! Auth::attempt(array(
+            'email' => Input::get('email'),
+            'password' => Input::get('password')
+        )))
         {
             return Redirect::back()->withInput()->withErrors(Lang::get('account.invalid'));
         }
@@ -57,28 +54,29 @@ class LoginController extends \Controllers\BaseController {
          return Redirect::intended('admin');
     }
 
-
     /**
      * Get the forgot password view. If the request has been redirected here
      * from a post then notify and redirect. We notify on success or error for
      * security.
      * @return Redirect | View
      */
-    public function getRemind()
+    public function forgot()
     {
         if (Session::has('success') or Session::has('error'))
         {
-            return Redirect::to('admin/login')->withInput()->with('message', Lang::get('account.reminders.sent'));
+            return Redirect::to('admin/login')
+                ->withInput()
+                ->with('alert', Lang::get('account.reminders.sent'));
         }
 
-        return View::make('admin.login.remind');
+        return View::make('admin.session.remind');
     }
 
     /**
      * Send password reminder.
      * @return Redirect
      */
-    public function postRemind()
+    public function remind()
     {
         if ( ! $this->validator->validate())
         {
@@ -96,28 +94,28 @@ class LoginController extends \Controllers\BaseController {
      * Get the reset view
      * @return View
      */
-    public function getReset()
+    public function recover($token)
     {
         if( Session::has('error') )
         {
             return Redirect::back()->withErrors(Lang::get('account.'.Session::get('reason')));
         }
 
-        return View::make('admin.login.reset')->with('token', $token);
+        return View::make('admin.session.reset')->with('token', $token);
     }
 
     /**
      * Reset user's password, log them in and redirect to appropriate app
      * @return Redirect
      */
-    public function postReset()
+    public function reset()
     {
         if ( ! $this->validator->reset())
         {
             return Redirect::back()->withInput()->withErrors($this->validator->errors());
         }
 
-        Password::reset(array('email' => $email), function($user, $password)
+        return Password::reset(array('email' => Input::get('email')), function($user, $password)
         {
             $user->password = Hash::make($password);
 
@@ -127,7 +125,16 @@ class LoginController extends \Controllers\BaseController {
 
             return Redirect::intended('admin');
         });
-
     }
 
+    /**
+     * Log the user out and return the logout view.
+     * @return View
+     */
+    public function logout()
+    {
+        Auth::logout();
+
+        return View::make('admin.session.logout');
+    }
 }

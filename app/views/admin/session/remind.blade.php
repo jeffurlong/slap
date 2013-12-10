@@ -1,4 +1,4 @@
-@extends('admin.layouts.login')
+@extends('admin.layouts.session')
 
 @section('content')
     <form method="post" novalidate>

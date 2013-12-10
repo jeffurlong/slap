@@ -118,7 +118,7 @@ Route::filter('tenant', function()
         return null;
     }
 
-    Session::put('tenant', App::make('Models\Setting')->getSessionData());
+    Session::put('tenant', App::make('Slap\Repositories\Interfaces\Setting')->getSessionData());
 
     return null;
 

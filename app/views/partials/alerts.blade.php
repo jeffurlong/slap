@@ -5,9 +5,7 @@
                 {{ $error }}
             @endforeach
         </div>
-    @elseif (Session::has('message'))
-        <div class="messages">
-             <div class="message">{{ Session::get('message') }}</div>
-        </div>
+    @elseif (Session::has('alert'))
+        <div class="alert">{{ Session::get('alert') }}</div>
     @endif
 </div>

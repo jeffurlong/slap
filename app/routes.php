@@ -20,15 +20,20 @@ if ( ! Request::subdomain() )
 
 Route::group(array('before' => 'tenant'), function()
 {
+    Route::get('admin/login',               'Controllers\Admin\SessionController@login');
+    Route::post('admin/login',              'Controllers\Admin\SessionController@attempt');
+    Route::get('admin/forgot',              'Controllers\Admin\SessionController@forgot');
+    Route::post('admin/forgot',             'Controllers\Admin\SessionController@remind');
+    Route::get('admin/recover/{token}',     'Controllers\Admin\SessionController@recover');
+    Route::post('admin/recover/{token}',    'Controllers\Admin\SessionController@reset');
+    Route::get('admin/logout',              'Controllers\Admin\SessionController@logout');
+
     Route::group(array('prefix' => 'admin'), function()
     {
         Route::get('/',                 'Controllers\Admin\DashboardController@getIndex');
-
-        Route::controller('login',      'Controllers\Admin\LoginController');
         Route::controller('dashboard',  'Controllers\Admin\DashboardController');
         Route::resource('page',         'Controllers\Admin\PageController');
     });
-    // Route::controller('account', 'Controllers\Tenant\AccountController');
 
     Route::get('{slug?}', 'Controllers\Tenant\PageController@findBySlug');
 });

@@ -20,16 +20,6 @@ class User extends \Eloquent implements UserInterface, RemindableInterface {
 	 */
 	protected $hidden = array('password');
 
-
-	/**
-	 * 1:1 Association to Person
-	 * @return BelongsTo
-	 */
-	public function person()
-	{
-		return $this->belongsTo('Models\Person');
-	}
-
 	/**
 	 * M:M Association to Role
 	 * @return BelongsToMany
@@ -38,7 +28,6 @@ class User extends \Eloquent implements UserInterface, RemindableInterface {
     {
         return $this->belongsToMany('Models\Role');
     }
-
 
 	/**
 	 * Determines if the user has the given role

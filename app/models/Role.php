@@ -1,5 +1,4 @@
-<?php
-namespace Models;
+<?php namespace Models;
 
 class Role extends \Eloquent {
 

@@ -1,5 +1,4 @@
-<?php
-namespace Slap\Services\Validators;
+<?php namespace Slap\Validators;
 
 abstract class Validator {
 
@@ -42,7 +41,6 @@ abstract class Validator {
 
             return false;
         }
-
         return true;
     }
 

@@ -1,7 +1,6 @@
-<?php
-namespace Slap\Services\Validators;
+<?php namespace Slap\Validators;
 
-class Login extends Validator {
+class Session extends Validator {
 
     public function __construct()
     {
@@ -14,7 +13,7 @@ class Login extends Validator {
     {
         $this->rules['password'] = 'required';
 
-        $this->validate();
+        return $this->validate();
     }
 
     public function reset()
@@ -22,6 +21,6 @@ class Login extends Validator {
         $this->rules['password'] = 'min:8|required|confirmed';
         $this->rules['password_confirmation'] = 'min:8|required';
 
-        $this->validate();
+        return $this->validate();
     }
 }
