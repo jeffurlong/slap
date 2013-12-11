@@ -24,8 +24,13 @@ class PageController extends \Controllers\BaseController {
      */
 	public function __construct(Repo $repo, Validator $validator)
 	{
+        $this->beforeFilter('auth-admin');
+
 		$this->repo 		= $repo;
+
 		$this->validator 	= $validator;
+
+		parent::__construct();
 	}
 
 	/**
@@ -57,10 +62,7 @@ class PageController extends \Controllers\BaseController {
             return Redirect::back()->withInput()->withErrors($this->validator->errors());
         }
 
-        if( ! $this->repo->create(Input::all()))
-        {
-        	return Redirect::back()->withInput()->withErrors('An error occured. Please try again');
-		}
+        $this->repo->create(Input::all());
 
 		return Redirect::to('/admin/pages')->with('alert', 'Your page has been saved');
 	}
@@ -100,10 +102,7 @@ class PageController extends \Controllers\BaseController {
             return Redirect::back()->withInput()->withErrors($this->validator->errors());
         }
 
-        if( ! $this->repo->update(Input::all()))
-        {
-        	return Redirect::back()->withInput()->withErrors('An error occured. Please try again');
-		}
+        $this->repo->update(Input::all());
 
 		return Redirect::to('/admin/pages')->with('alert', 'Your page has been saved');
 
@@ -117,7 +116,23 @@ class PageController extends \Controllers\BaseController {
 	 */
 	public function destroy($id)
 	{
-		//
+		$this->repo->destroy($id);
+
+		return Redirect::to('/admin/pages')->with('alert', 'The page has been deleted');
+	}
+
+
+	/**
+	 * Delete the specified resource from storage.
+	 *
+	 * @param  int  $id
+	 * @return Response
+	 */
+	public function delete($id)
+	{
+		$this->repo->delete($id);
+
+		return Redirect::to('/admin/pages')->with('alert', 'The page has been deleted');
 	}
 
 }

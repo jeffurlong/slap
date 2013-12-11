@@ -53,11 +53,16 @@ App::error(function(Exception $exception, $code)
 	Log::error($exception);
 });
 
+App::error(function(Illuminate\Database\Eloquent\ModelNotFoundException $e)
+{
+    return Response::view('404', array(), 404);
+});
 
 App::missing(function($exception)
 {
     return Response::view('404', array(), 404);
 });
+
 
 
 

@@ -1,6 +1,6 @@
 <?php namespace Controllers\Tenant;
 
-use View;
+use View, App;
 
 class PageController extends \Controllers\BaseController {
 
@@ -13,10 +13,7 @@ class PageController extends \Controllers\BaseController {
 
     public function findBySlug($slug = null)
     {
-        if ( ! $page = $this->page->findBySlug($slug))
-        {
-            \App::abort('404');
-        }
+        $page = $this->page->findBySlug($slug);
 
         return View::make('tenant.default', compact('page'));
     }

@@ -2,6 +2,8 @@
 @section('content')
     <h2>Page</h2>
     <form method="post" action="/admin/pages{{ ( $page->exists) ? '/'.$page->id : ''}}" novalidate>
+        {{ Form::token() }}
+        
         <div class="form-group">
             <label for="title">Title</label>
             <input type="text" required class="form-control " id="title" name="title"
