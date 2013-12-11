@@ -1,8 +1,10 @@
-<?php
-namespace Controllers\Admin;
+<?php namespace Controllers\Admin;
+use View, Input, Redirect;
+use Slap\Repositories\Interfaces\Page as Repo;
+use \Slap\Validators\Page as Validator;
 
 class PageController extends \Controllers\BaseController {
-	
+
 	/**
      * Repository
      * @var Page
@@ -15,41 +17,52 @@ class PageController extends \Controllers\BaseController {
      */
     private $validator;
 
-	public function __construct(\Slap\Repositories\Interfaces\Page $repo, \Slap\Validators\Page $validator)
+    /**
+     * Constructor
+     * @param Repo      $repo
+     * @param Validator $validator
+     */
+	public function __construct(Repo $repo, Validator $validator)
 	{
-		$this->repo = $repo;
-		
-		$this->validator = $validator;
+		$this->repo 		= $repo;
+		$this->validator 	= $validator;
 	}
 
 	/**
 	 * Display a listing of the resource.
-	 *
 	 * @return Response
 	 */
 	public function index()
 	{
-		
+		return View::make('admin.pages.index', array('pages' => $this->repo->all()));
 	}
 
 	/**
 	 * Show the form for creating a new resource.
-	 *
 	 * @return Response
 	 */
 	public function create()
 	{
-		//
+		return View::make('admin.pages.form', array('page' => $this->repo->instance()));
 	}
 
 	/**
 	 * Store a newly created resource in storage.
-	 *
 	 * @return Response
 	 */
 	public function store()
 	{
-		//
+		if ( ! $this->validator->validate())
+        {
+            return Redirect::back()->withInput()->withErrors($this->validator->errors());
+        }
+
+        if( ! $this->repo->create(Input::all()))
+        {
+        	return Redirect::back()->withInput()->withErrors('An error occured. Please try again');
+		}
+
+		return Redirect::to('/admin/pages')->with('alert', 'Your page has been saved');
 	}
 
 	/**
@@ -71,7 +84,7 @@ class PageController extends \Controllers\BaseController {
 	 */
 	public function edit($id)
 	{
-		//
+		return View::make('admin.pages.form', array('page' => $this->repo->find($id)));
 	}
 
 	/**
@@ -82,7 +95,18 @@ class PageController extends \Controllers\BaseController {
 	 */
 	public function update($id)
 	{
-		//
+		if ( ! $this->validator->validate())
+        {
+            return Redirect::back()->withInput()->withErrors($this->validator->errors());
+        }
+
+        if( ! $this->repo->update(Input::all()))
+        {
+        	return Redirect::back()->withInput()->withErrors('An error occured. Please try again');
+		}
+
+		return Redirect::to('/admin/pages')->with('alert', 'Your page has been saved');
+
 	}
 
 	/**

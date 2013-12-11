@@ -2,6 +2,10 @@
 
 interface Page {
 
+    public function instance();
+    public function all();
+    public function find($id);
+    public function update(array $input);
+    public function create(array $input);
     public function findBySlug($slug);
-
 }
