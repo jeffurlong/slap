@@ -1,13 +1,12 @@
 <?php namespace Controllers\Admin;
 
 use View;
+use Controllers\BaseController;
 
-class DashboardController extends \Controllers\BaseController {
+class DashboardController extends BaseController {
 
     public function __construct()
     {
-
-
         $this->beforeFilter('auth-admin');
 
         parent::__construct();
@@ -17,5 +16,5 @@ class DashboardController extends \Controllers\BaseController {
     {
         return View::make('admin.dashboard.index');
     }
-    
+
 }

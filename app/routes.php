@@ -32,7 +32,13 @@ Route::group(array('before' => 'tenant'), function()
     {
         Route::get('/',                 'Controllers\Admin\DashboardController@getIndex');
         Route::controller('dashboard',  'Controllers\Admin\DashboardController');
-        Route::resource('pages',         'Controllers\Admin\PageController');
+        Route::resource('pages',        'Controllers\Admin\PageController');
+
+        Route::group(array('prefix' => 'settings'), function()
+        {
+            Route::controller('staff', 'Controllers\Admin\StaffController');
+        });
+
     });
 
     Route::get('{slug?}', 'Controllers\Tenant\PageController@findBySlug');

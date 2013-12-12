@@ -1,15 +1,18 @@
 <?php namespace Controllers\Admin;
-use View, Input, Redirect;
-use Slap\Repositories\Interfaces\Page as Repo;
-use \Slap\Validators\Page as Validator;
 
-class PageController extends \Controllers\BaseController {
+use View, Input, Redirect;
+use Controllers\BaseController;
+use Slap\Validators\PageValidator;
+use Slap\Repositories\Interfaces\PageRepositoryInterface;
+
+
+class PageController extends BaseController {
 
 	/**
      * Repository
      * @var Page
      */
-    private $repo;
+    private $pages;
 
 	/**
      * Validator
@@ -19,16 +22,16 @@ class PageController extends \Controllers\BaseController {
 
     /**
      * Constructor
-     * @param Repo      $repo
-     * @param Validator $validator
+     * @param PageRepositoryInterface   $pages
+     * @param PageValidator             $validator
      */
-	public function __construct(Repo $repo, Validator $validator)
+	public function __construct(PageRepositoryInterface $pages, PageValidator $validator)
 	{
         $this->beforeFilter('auth-admin');
 
-		$this->repo 		= $repo;
+		$this->pages = $pages;
 
-		$this->validator 	= $validator;
+		$this->validator = $validator;
 
 		parent::__construct();
 	}
@@ -39,7 +42,7 @@ class PageController extends \Controllers\BaseController {
 	 */
 	public function index()
 	{
-		return View::make('admin.pages.index', array('pages' => $this->repo->all()));
+		return View::make('admin.pages.index', array('pages' => $this->pages->all()));
 	}
 
 	/**
@@ -48,7 +51,7 @@ class PageController extends \Controllers\BaseController {
 	 */
 	public function create()
 	{
-		return View::make('admin.pages.form', array('page' => $this->repo->instance()));
+		return View::make('admin.pages.form', array('page' => $this->pages->instance()));
 	}
 
 	/**
@@ -62,7 +65,7 @@ class PageController extends \Controllers\BaseController {
             return Redirect::back()->withInput()->withErrors($this->validator->errors());
         }
 
-        $this->repo->create(Input::all());
+        $this->pages->create(Input::all());
 
 		return Redirect::to('/admin/pages')->with('alert', 'Your page has been saved');
 	}
@@ -86,7 +89,7 @@ class PageController extends \Controllers\BaseController {
 	 */
 	public function edit($id)
 	{
-		return View::make('admin.pages.form', array('page' => $this->repo->find($id)));
+		return View::make('admin.pages.form', array('page' => $this->pages->find($id)));
 	}
 
 	/**
@@ -102,7 +105,7 @@ class PageController extends \Controllers\BaseController {
             return Redirect::back()->withInput()->withErrors($this->validator->errors());
         }
 
-        $this->repo->update(Input::all());
+        $this->pages->update(Input::all());
 
 		return Redirect::to('/admin/pages')->with('alert', 'Your page has been saved');
 
@@ -116,7 +119,7 @@ class PageController extends \Controllers\BaseController {
 	 */
 	public function destroy($id)
 	{
-		$this->repo->destroy($id);
+		$this->pages->destroy($id);
 
 		return Redirect::to('/admin/pages')->with('alert', 'The page has been deleted');
 	}
@@ -130,7 +133,7 @@ class PageController extends \Controllers\BaseController {
 	 */
 	public function delete($id)
 	{
-		$this->repo->delete($id);
+		$this->pages->delete($id);
 
 		return Redirect::to('/admin/pages')->with('alert', 'The page has been deleted');
 	}

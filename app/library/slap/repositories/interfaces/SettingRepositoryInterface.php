@@ -1,6 +1,6 @@
 <?php namespace Slap\Repositories\Interfaces;
 
-interface Setting {
+interface SettingRepositoryInterface {
 
     public function getSessionData();
 

@@ -1,6 +1,6 @@
 <?php namespace Slap\Repositories\Interfaces;
 
-interface Page {
+interface PageRepositoryInterface {
 
     public function instance();
     public function all();
@@ -9,6 +9,6 @@ interface Page {
     public function create(array $input);
     public function delete($id);
     public function destroy($id);
-    
+
     public function findBySlug($slug);
 }

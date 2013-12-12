@@ -1,28 +1,29 @@
 <?php namespace Slap\Repositories\Eloquent;
 
 use Str;
-use Models\Page as Model;
+use Models\Page;
+use Slap\Repositories\Interfaces\PageRepositoryInterface;
 
-class Page implements \Slap\Repositories\Interfaces\Page  {
+class PageRepository implements PageRepositoryInterface  {
 
     public function instance()
     {
-        return new Model;
+        return new Page;
     }
 
     public function all()
     {
-        return Model::orderBy('updated_at', 'desc')->get();
+        return Page::orderBy('updated_at', 'desc')->get();
     }
 
     public function find($id)
     {
-         return Model::findOrFail($id);
+         return Page::findOrFail($id);
     }
 
     public function update(array $input)
     {
-        return $this->meta(Model::find($input['id'])->fill($input))->save();   
+        return $this->meta(Page::find($input['id'])->fill($input))->save();
     }
 
     public function create(array $input)
@@ -32,19 +33,19 @@ class Page implements \Slap\Repositories\Interfaces\Page  {
 
     public function delete($id)
     {
-        return Model::destroy($id);
+        return Page::destroy($id);
     }
 
     public function destroy($id)
     {
-        return Model::findOrFail($id)->forceDelete();
+        return Page::findOrFail($id)->forceDelete();
     }
 
     public function findBySlug($slug)
     {
         $slug = $slug ?: 'home';
 
-        return Model::where('slug', $slug)->firstOrFail();
+        return Page::where('slug', $slug)->firstOrFail();
     }
 
     private function meta($model)
@@ -58,7 +59,7 @@ class Page implements \Slap\Repositories\Interfaces\Page  {
         {
             $model->meta_description = substr(strip_tags(str_replace ('>', '> ', $model->content)), 0, 150).'...';
         }
-        
+
         if( ! $model->exists)
         {
             $model->slug = Str::slug($model->title);

@@ -1,6 +1,6 @@
 <?php namespace Slap\Validators;
 
-class Session extends Validator {
+class SessionValidator extends Validator {
 
     public function __construct()
     {

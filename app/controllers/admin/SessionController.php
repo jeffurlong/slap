@@ -1,8 +1,10 @@
 <?php namespace Controllers\Admin;
 
 use View, Notification, Redirect, Auth, Input, Lang, Session, Password, Hash;
+use Controllers\BaseController;
+use Slap\Validators\SessionValidator;
 
-class SessionController extends \Controllers\BaseController {
+class SessionController extends BaseController {
 
     /**
      * Validator
@@ -15,7 +17,7 @@ class SessionController extends \Controllers\BaseController {
      * @param Validator $validator
      * @return void
      */
-    public function __construct(\Slap\Validators\Session $validator)
+    public function __construct(SessionValidator $validator)
     {
         $this->validator = $validator;
 

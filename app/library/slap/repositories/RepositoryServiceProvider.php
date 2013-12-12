@@ -4,19 +4,19 @@ class RepositoryServiceProvider extends \Illuminate\Support\ServiceProvider {
 
     public function register()
     {
-        $this->app->bind(
-            'Slap\Repositories\Interfaces\Setting',
-            'Slap\Repositories\Eloquent\Setting'
+       $this->app->bind(
+            'Slap\Repositories\Interfaces\PageRepositoryInterface',
+            'Slap\Repositories\Eloquent\PageRepository'
         );
 
         $this->app->bind(
-            'Slap\Repositories\Interfaces\Page',
-            'Slap\Repositories\Eloquent\Page'
+            'Slap\Repositories\Interfaces\SettingRepositoryInterface',
+            'Slap\Repositories\Eloquent\SettingRepository'
         );
 
         $this->app->bind(
-            'Slap\Repositories\Interfaces\User',
-            'Slap\Repositories\Eloquent\User'
+            'Slap\Repositories\Interfaces\UserRepositoryInterface',
+            'Slap\Repositories\Eloquent\UserRepository'
         );
     }
 

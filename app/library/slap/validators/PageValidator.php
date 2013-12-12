@@ -1,6 +1,6 @@
 <?php namespace Slap\Validators;
 
-class Page extends Validator {
+class PageValidator extends Validator {
 
     public function __construct()
     {

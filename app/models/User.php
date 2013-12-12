@@ -1,21 +1,20 @@
 <?php
 namespace Models;
 
+use Config;
 use Illuminate\Auth\UserInterface;
 use Illuminate\Auth\Reminders\RemindableInterface;
 
 class User extends \Eloquent implements UserInterface, RemindableInterface {
 
 	/**
-	 * The database table used by the model.
-	 *
-	 * @var string
+	 * Attributes protected from mass assignment
+	 * @var array
 	 */
-	protected $table = 'users';
+	protected $guarded = array('id', 'password');
 
 	/**
 	 * The attributes excluded from the model's JSON form.
-	 *
 	 * @var array
 	 */
 	protected $hidden = array('password');
@@ -45,6 +44,12 @@ class User extends \Eloquent implements UserInterface, RemindableInterface {
         }
 
         return false;
+   	}
+
+   	public function scopeAdmin($query)
+   	{
+   		return $query->join('role_user', 'users.id', '=', 'role_user.user_id')
+            ->where('role_user.role_id','=',Config::get('auth.roles.admin'));
    	}
 
 	/**
