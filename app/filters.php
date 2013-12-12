@@ -120,7 +120,7 @@ Route::filter('tenant', function()
         return null;
     }
 
-    Session::put('tenant', App::make('Slap\Repositories\Interfaces\Setting')->getSessionData());
+    Session::put('tenant', App::make('Slap\Repositories\Interfaces\SettingRepositoryInterface')->getSessionData());
 
     return null;
 

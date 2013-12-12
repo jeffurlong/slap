@@ -19,6 +19,10 @@ class User extends \Eloquent implements UserInterface, RemindableInterface {
 	 */
 	protected $hidden = array('password');
 
+    // =========================================================================
+    // REALTIONSHIPS
+    // =========================================================================
+
 	/**
 	 * M:M Association to Role
 	 * @return BelongsToMany
@@ -28,29 +32,24 @@ class User extends \Eloquent implements UserInterface, RemindableInterface {
         return $this->belongsToMany('Models\Role');
     }
 
-	/**
-	 * Determines if the user has the given role
-	 * @param  string 	$name 	Role name
-	 * @return boolean
-	 */
-	public function hasRole($name)
-	{
-        foreach ($this->roles as $role)
-        {
-            if( $role->name === $name )
-            {
-                return true;
-            }
-        }
+    // =========================================================================
+    // SCOPES
+    // =========================================================================
 
-        return false;
-   	}
-
+    /**
+     * Limit query to Users with admin role
+     * @param  \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
    	public function scopeAdmin($query)
    	{
    		return $query->join('role_user', 'users.id', '=', 'role_user.user_id')
             ->where('role_user.role_id','=',Config::get('auth.roles.admin'));
    	}
+
+    // =========================================================================
+    // ACCESSORS
+    // =========================================================================
 
 	/**
 	 * Get the unique identifier for the user.
@@ -78,5 +77,27 @@ class User extends \Eloquent implements UserInterface, RemindableInterface {
 	{
 		return $this->email;
 	}
+
+    // =========================================================================
+    // CLASS METHODS
+    // =========================================================================
+
+    /**
+     * Determines if the user has the given role
+     * @param  string   $name   Role name
+     * @return boolean
+     */
+    public function hasRole($name)
+    {
+        foreach ($this->roles as $role)
+        {
+            if( $role->name === $name )
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 }

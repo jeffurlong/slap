@@ -5,7 +5,6 @@ use Controllers\BaseController;
 use Slap\Validators\PageValidator;
 use Slap\Repositories\Interfaces\PageRepositoryInterface;
 
-
 class PageController extends BaseController {
 
 	/**
@@ -30,14 +29,13 @@ class PageController extends BaseController {
         $this->beforeFilter('auth-admin');
 
 		$this->pages = $pages;
-
 		$this->validator = $validator;
 
 		parent::__construct();
 	}
 
 	/**
-	 * Display a listing of the resource.
+	 * Display a listing of all pages.
 	 * @return Response
 	 */
 	public function index()
@@ -46,7 +44,7 @@ class PageController extends BaseController {
 	}
 
 	/**
-	 * Show the form for creating a new resource.
+	 * Show the form for creating a new page.
 	 * @return Response
 	 */
 	public function create()
@@ -55,7 +53,7 @@ class PageController extends BaseController {
 	}
 
 	/**
-	 * Store a newly created resource in storage.
+	 * Store a newly created page in storage.
 	 * @return Response
 	 */
 	public function store()
@@ -71,19 +69,7 @@ class PageController extends BaseController {
 	}
 
 	/**
-	 * Display the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function show($id)
-	{
-		//
-	}
-
-	/**
-	 * Show the form for editing the specified resource.
-	 *
+	 * Show the form for editing the specified page.
 	 * @param  int  $id
 	 * @return Response
 	 */
@@ -93,8 +79,7 @@ class PageController extends BaseController {
 	}
 
 	/**
-	 * Update the specified resource in storage.
-	 *
+	 * Update the specified page in storage.
 	 * @param  int  $id
 	 * @return Response
 	 */
@@ -108,34 +93,45 @@ class PageController extends BaseController {
         $this->pages->update(Input::all());
 
 		return Redirect::to('/admin/pages')->with('alert', 'Your page has been saved');
-
 	}
 
-	/**
-	 * Remove the specified resource from storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function destroy($id)
-	{
-		$this->pages->destroy($id);
-
-		return Redirect::to('/admin/pages')->with('alert', 'The page has been deleted');
-	}
+    /**
+     * Display the specified page.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    // public function show($id)
+    // {
+    //     Might use this for previewing
+    // }
 
 
-	/**
-	 * Delete the specified resource from storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function delete($id)
-	{
-		$this->pages->delete($id);
+	// /**
+	//  * Remove the specified resource from storage.
+	//  *
+	//  * @param  int  $id
+	//  * @return Response
+	//  */
+	// public function destroy($id)
+	// {
+	// 	$this->pages->destroy($id);
 
-		return Redirect::to('/admin/pages')->with('alert', 'The page has been deleted');
-	}
+	// 	return Redirect::to('/admin/pages')->with('alert', 'The page has been deleted');
+	// }
+
+
+	// /**
+	//  * Delete the specified resource from storage.
+	//  *
+	//  * @param  int  $id
+	//  * @return Response
+	//  */
+	// public function delete($id)
+	// {
+	// 	$this->pages->delete($id);
+
+	// 	return Redirect::to('/admin/pages')->with('alert', 'The page has been deleted');
+	// }
 
 }

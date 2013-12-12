@@ -27,13 +27,17 @@ class StaffController extends BaseController {
         parent::__construct();
     }
 
+    /**
+     * Display a listing of all admins
+     * @return Response
+     */
     public function getIndex()
     {
-        return View::make('admin.settings.staff.index', array('admins' => $this->users->admins()));
+        return View::make('admin.settings.staff.index', array('admins' => $this->users->allAdmins()));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new admin
      * @return Response
      */
     public function getCreate()
@@ -42,7 +46,7 @@ class StaffController extends BaseController {
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created admin in storage.
      * @return Response
      */
     public function postCreate()

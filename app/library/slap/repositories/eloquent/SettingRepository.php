@@ -3,9 +3,9 @@
 use Models\Setting;
 use Slap\Repositories\Interfaces\SettingRepositoryInterface;
 
-class SettingRepositoryInterface implements SettingRepositoryInterface {
+class SettingRepository implements SettingRepositoryInterface {
 
-     /**
+    /**
      * Session key value pairs
      * @return array
      */
